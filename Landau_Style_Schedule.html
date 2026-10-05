@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Расписание и домашние задания</title>
+<style>
+  :root {
+    --bg: #f5f7fb;
+    --surface: #ffffff;
+    --surface-2: #eef3f8;
+    --text: #101820;
+    --muted: #687481;
+    --line: #dfe6ed;
+    --accent: #0b5cff;
+    --accent-dark: #073da8;
+    --navy: #071a2f;
+    --shadow: 0 14px 40px rgba(7, 26, 47, .08);
+    --radius: 18px;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    font-family: Inter, "Helvetica Neue", Arial, system-ui, sans-serif;
+    background:
+      radial-gradient(circle at 85% 0%, rgba(11, 92, 255, .10), transparent 30%),
+      var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  header {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 28px 24px 20px;
+  }
+
+  header::before {
+    content: "LANDAU SCHOOL";
+    display: inline-flex;
+    align-items: center;
+    min-height: 34px;
+    padding: 0 13px;
+    border-radius: 999px;
+    background: var(--navy);
+    color: #fff;
+    font-size: .72rem;
+    font-weight: 800;
+    letter-spacing: .13em;
+    margin-bottom: 18px;
+  }
+
+  header h1 {
+    margin: 0;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    line-height: 1.05;
+    font-weight: 800;
+    letter-spacing: -.045em;
+    color: var(--navy);
+  }
+
+  header p {
+    margin: 10px 0 0;
+    color: var(--muted);
+    font-size: .92rem;
+  }
+
+  main {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 24px 70px;
+  }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin: 12px 0 30px;
+  }
+
+  .chip {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 9px 16px;
+    font: inherit;
+    font-size: .92rem;
+    font-weight: 700;
+    color: var(--muted);
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(7, 26, 47, .04);
+  }
+
+  .chip:hover {
+    color: var(--accent);
+    border-color: rgba(11, 92, 255, .35);
+    transform: translateY(-2px);
+  }
+
+  .chip.active {
+    color: #fff;
+    background: var(--accent);
+    border-color: var(--accent);
+    box-shadow: 0 8px 22px rgba(11, 92, 255, .22);
+  }
+
+  .tabs {
+    display: inline-flex;
+    gap: 5px;
+    padding: 5px;
+    background: var(--surface-2);
+    border-radius: 14px;
+    margin-bottom: 30px;
+  }
+
+  .tab {
+    background: transparent;
+    border: 0;
+    border-radius: 10px;
+    padding: 10px 17px;
+    font: inherit;
+    font-size: .78rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--muted);
+    cursor: pointer;
+  }
+
+  .tab:hover { color: var(--navy); }
+
+  .tab.active {
+    color: #fff;
+    background: var(--navy);
+    box-shadow: 0 5px 14px rgba(7, 26, 47, .15);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 18px;
+  }
+
+  .card {
+    position: relative;
+    overflow: hidden;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+  }
+
+  .card::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent), #53a0ff);
+  }
+
+  .card h3 {
+    margin: 0 0 14px;
+    font-size: .88rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .09em;
+    color: var(--navy);
+  }
+
+  .card .badge {
+    display: inline-flex;
+    margin-left: 8px;
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: #e9f1ff;
+    color: var(--accent);
+    font-size: .67rem;
+    font-weight: 800;
+    text-transform: none;
+    letter-spacing: 0;
+    vertical-align: middle;
+  }
+
+  .card ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: n;
+  }
+
+  .card li {
+    counter-increment: n;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--line);
+    transition: .22s ease;
+  }
+
+  .card li:last-child { border-bottom: 0; }
+
+  .card li::before {
+    content: counter(n);
+    display: grid;
+    place-items: center;
+    width: 27px;
+    height: 27px;
+    flex: none;
+    border-radius: 8px;
+    background: var(--surface-2);
+    color: var(--accent);
+    font-size: .74rem;
+    font-weight: 800;
+  }
+
+  .card li:hover {
+    padding-left: 5px;
+    color: var(--accent-dark);
+  }
+
+  .card li .name { flex: 1; font-weight: 600; }
+
+  .card li .time {
+    color: var(--muted);
+    font-size: .76rem;
+    white-space: nowrap;
+    font-weight: 600;
+  }
+
+  .card li.lunch {
+    color: var(--muted);
+    font-style: normal;
+  }
+
+  .hw-day {
+    margin-bottom: 20px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+  }
+
+  .hw-day h3 {
+    margin: 0 0 7px;
+    padding: 0;
+    border: 0;
+    font-size: .88rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .09em;
+    color: var(--navy);
+  }
+
+  .hw-item {
+    display: grid;
+    grid-template-columns: 190px 1fr;
+    gap: 18px;
+    padding: 13px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .hw-item:last-child { border-bottom: 0; }
+
+  .hw-item b { font-weight: 800; color: var(--accent-dark); }
+  .hw-item span { color: var(--text); }
+
+  .empty {
+    background: var(--surface);
+    border: 1px dashed #cbd6e2;
+    border-radius: var(--radius);
+    color: var(--muted);
+    padding: 32px;
+    text-align: center;
+  }
+
+  /* Animations */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  header h1 { animation: fadeUp .65s ease both; }
+  header p { animation: fadeUp .65s .08s ease both; }
+  header::before { animation: fadeUp .55s ease both; }
+  .chips, .tabs { animation: fadeIn .6s .15s ease both; }
+
+  .card, .hw-day, .hw-item, .empty {
+    animation: fadeUp .5s ease both;
+    animation-delay: calc(min(var(--i, 0), 14) * 55ms);
+  }
+
+  .chip, .tab { transition: color .2s ease, background .2s ease, border-color .2s ease, transform .2s ease, box-shadow .2s ease; }
+  .chip:active, .tab:active { transform: scale(.97); }
+
+  @media (max-width: 650px) {
+    header { padding: 24px 16px 18px; }
+    main { padding: 0 16px 50px; }
+    header h1 { font-size: 2.25rem; }
+    .grid { grid-template-columns: 1fr; }
+    .hw-item { grid-template-columns: 1fr; gap: 3px; }
+    .tabs { width: 100%; }
+    .tab { flex: 1; padding-left: 8px; padding-right: 8px; }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #08111d;
+      --surface: #0e1b2b;
+      --surface-2: #15263a;
+      --text: #edf4fb;
+      --muted: #91a1b1;
+      --line: #203247;
+      --navy: #f2f7fc;
+      --shadow: 0 14px 40px rgba(0, 0, 0, .22);
+    }
+
+    header h1, .card h3, .hw-day h3 { color: #f2f7fc; }
+    .tab.active { background: #fff; color: #071a2f; }
+    .card li::before { background: #162a41; }
+  }
+
+  [hidden] { display: none !important; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+.portal-note { margin-top: 16px; color: var(--muted); font-size: .78rem; font-weight: 700; letter-spacing: .04em; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1 id="schoolName"></h1>
+  <p id="updated"></p><div class="portal-note">Student Portal · Schedule & Homework</div>
+</header>
+
+<main>
+  <div id="classes" class="chips"></div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="schedule">Расписание</button>
+    <button class="tab" data-tab="homework">Домашнее задание</button>
+  </div>
+
+  <section id="schedule"></section>
+  <section id="homework" hidden></section>
+</main>
+
+<script src="data.js"></script>
+<script>
+  const DAYS = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"];
+  const $ = id => document.getElementById(id);
+
+  function el(tag, cls, text) {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text !== undefined) e.textContent = text;
+    return e;
+  }
+
+  let current = null;
+  let tab = "schedule";
+
+  function todayName() {
+    const d = new Date().getDay();
+    return d === 0 ? null : DAYS[d - 1];
+  }
+
+  function todayKey() {
+    const d = new Date();
+    const p = n => String(n).padStart(2, "0");
+    return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate());
+  }
+
+  function parseDate(s) {
+    const [y, m, d] = s.split("-").map(Number);
+    return new Date(y, m - 1, d);
+  }
+
+  function pickInitial() {
+    const names = Object.keys(SCHOOL.classes);
+    const fromHash = decodeURIComponent(location.hash.slice(1));
+    if (names.includes(fromHash)) return fromHash;
+    try {
+      const saved = localStorage.getItem("school_class");
+      if (names.includes(saved)) return saved;
+    } catch (e) {}
+    return names[0];
+  }
+
+  function setClass(name) {
+    current = name;
+    try { localStorage.setItem("school_class", name); } catch (e) {}
+    history.replaceState(null, "", "#" + encodeURIComponent(name));
+    renderChips();
+    renderSchedule();
+    renderHomework();
+  }
+
+  function renderChips() {
+    const box = $("classes");
+    box.innerHTML = "";
+    Object.keys(SCHOOL.classes).forEach(name => {
+      const b = el("button", "chip" + (name === current ? " active" : ""), name);
+      b.onclick = () => setClass(name);
+      box.appendChild(b);
+    });
+  }
+
+  function renderSchedule() {
+    const box = $("schedule");
+    box.innerHTML = "";
+    const sch = SCHOOL.classes[current].schedule || {};
+    const today = todayName();
+    const grid = el("div", "grid");
+
+    DAYS.forEach(day => {
+      const lessons = sch[day];
+      if (!lessons || !lessons.length) return;
+      const card = el("div", "card");
+      card.style.setProperty("--i", grid.children.length);
+      const h = el("h3", null, day);
+      if (day === today) h.appendChild(el("span", "badge", "— сегодня"));
+      card.appendChild(h);
+      const ol = el("ol");
+      lessons.forEach((l, i) => {
+        const li = el("li", l.toLowerCase() === "обед" ? "lunch" : null);
+        li.appendChild(el("span", "name", l));
+        const t = SCHOOL.bellTimes && SCHOOL.bellTimes[i];
+        if (t) li.appendChild(el("span", "time", t));
+        ol.appendChild(li);
+      });
+      card.appendChild(ol);
+      grid.appendChild(card);
+    });
+
+    if (!grid.children.length) box.appendChild(el("p", "empty", "Расписание пока не добавлено."));
+    else box.appendChild(grid);
+  }
+
+  function renderHomework() {
+    const box = $("homework");
+    box.innerHTML = "";
+    const list = SCHOOL.classes[current].homework || [];
+
+    const back = SCHOOL.homeworkDaysBack ?? 14;
+    const limit = new Date();
+    limit.setHours(0, 0, 0, 0);
+    limit.setDate(limit.getDate() - back);
+
+    const byDate = {};
+    list.forEach(h => {
+      if (parseDate(h.date) < limit) return;
+      (byDate[h.date] = byDate[h.date] || []).push(h);
+    });
+
+    const dates = Object.keys(byDate).sort().reverse();
+    if (!dates.length) {
+      box.appendChild(el("p", "empty", "Домашнего задания пока нет."));
+      return;
+    }
+
+    const tk = todayKey();
+    let n = 0;
+    dates.forEach(date => {
+      const wrap = el("div", "hw-day");
+      wrap.style.setProperty("--i", n++);
+      const title = parseDate(date).toLocaleDateString("ru-RU", {
+        weekday: "long", day: "numeric", month: "long"
+      });
+      wrap.appendChild(el("h3", null, title + (date === tk ? " — сегодня" : "")));
+      byDate[date].forEach(h => {
+        const item = el("div", "hw-item");
+        item.style.setProperty("--i", n++);
+        item.appendChild(el("b", null, h.subject));
+        item.appendChild(el("span", null, h.task));
+        wrap.appendChild(item);
+      });
+      box.appendChild(wrap);
+    });
+  }
+
+  document.querySelectorAll(".tab").forEach(btn => {
+    btn.onclick = () => {
+      tab = btn.dataset.tab;
+      document.querySelectorAll(".tab").forEach(b => b.classList.toggle("active", b === btn));
+      $("schedule").hidden = tab !== "schedule";
+      $("homework").hidden = tab !== "homework";
+    };
+  });
+
+  $("schoolName").textContent = SCHOOL.name;
+  $("updated").textContent = SCHOOL.updated ? "Обновлено: " + SCHOOL.updated : "";
+  document.title = SCHOOL.name + " — расписание и ДЗ";
+  setClass(pickInitial());
+</script>
+</body>
+</html>
